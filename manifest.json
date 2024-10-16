@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "Webpage Summarizer",
+    "version": "1.0",
+    "description": "Summarize webpage content directly in your browser using Google Gemini API",
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["<all_urls>", "https://gemini.googleapis.com/*"],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
