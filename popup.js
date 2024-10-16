@@ -1,16 +1,16 @@
-document.getElementById("summarizeBtn").addEventListener("click", async () => {
+document.getElementById("offerBtn").addEventListener("click", async () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.scripting.executeScript(
       {
         target: { tabId: tabs[0].id },
-        function: summarizePageContent,
+        function: getPageContent,
       },
       async (results) => {
         if (results && results[0].result) {
-          const summarizedText = await summarizeWithBackend(results[0].result);
-          document.getElementById("summary").value = summarizedText;
+          const response = await offerWithBackend(results[0].result);
+          document.getElementById("resultArea").value = response;
         } else {
-          document.getElementById("summary").value =
+          document.getElementById("resultArea").value =
             "Could not extract or summarize the page content.";
         }
       }
@@ -20,7 +20,13 @@ document.getElementById("summarizeBtn").addEventListener("click", async () => {
 
 var oldMessages = [];
 
-async function summarizeWithBackend(text) {
+/**
+ * It sends page content to backend with system message and gets the response.
+ * @param {string} text 
+ * @returns {string} The offer text
+ */
+async function offerWithBackend(text) {
+  document.getElementById("offerBtn").innerText = "Loading...";
   const url = "https://gpt.unl.cx/chat"; // Your backend endpoint
 
   const headers = {
@@ -58,20 +64,24 @@ async function summarizeWithBackend(text) {
     const data = await response.json();
     console.log("API response data:", data); // Log response for debugging
     let json = data.choices[0].message.content || JSON.stringify({
-      text: "No summary found",
+      text: "No offer found",
     });
     
     const message = JSON.parse(json).text;
     oldMessages.push({ role: "assistant", content: message });
     oldMessages.push({ role: "user", content: "Can you offer me something different?" });
+    document.getElementById("offerBtn").innerText = "Offer me";
     return message;
   } catch (error) {
-    console.error("Error summarizing with backend:", error);
-    return "Error summarizing the text";
+    console.error("Error offering some food with backend:", error);
+    return "Error offering some food with backend";
   }
 }
 
-function summarizePageContent() {
+/**
+ * @returns {string} The text content of the page
+ */
+function getPageContent() {
   const bodyText = document.body.innerText;
   return bodyText.replace(/\s+/g, " ").trim();
 }
