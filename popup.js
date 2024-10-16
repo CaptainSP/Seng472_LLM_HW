@@ -18,6 +18,8 @@ document.getElementById("summarizeBtn").addEventListener("click", async () => {
   });
 });
 
+var oldMessages = [];
+
 async function summarizeWithBackend(text) {
   const url = "https://gpt.unl.cx/chat"; // Your backend endpoint
 
@@ -32,12 +34,12 @@ async function summarizeWithBackend(text) {
       You are a food assistant. We will give you a some web content that details about yemeksepeti.com that is a popular food delivery website in Turkey. Your task is to offer some food to user:
       The response format should be like this in json:
       {
-        text: "I recommend you to try the pizza with extra cheese in the ... restaurant. It is delicious!"
+        text: "I recommend you to try the ... in the ... restaurant. It is delicious!"
       },
 
-      do not forget to offer different food types to the user. Good luck!
+      do not forget to offer different food types to the user at everytime. Good luck!
       `,
-    },{ role: "user", content: text }],
+    },{ role: "user", content: text }, ...oldMessages],
   });
 
   try {
@@ -58,7 +60,10 @@ async function summarizeWithBackend(text) {
     let json = data.choices[0].message.content || JSON.stringify({
       text: "No summary found",
     });
-    return JSON.parse(json).text;
+    
+    const message = JSON.parse(json).text;
+    oldMessages.push({ role: "assistant", content: message });
+    return message;
   } catch (error) {
     console.error("Error summarizing with backend:", error);
     return "Error summarizing the text";
