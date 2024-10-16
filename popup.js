@@ -34,7 +34,7 @@ async function summarizeWithBackend(text) {
       You are a food assistant. We will give you a some web content that details about yemeksepeti.com that is a popular food delivery website in Turkey. Your task is to offer some food to user:
       The response format should be like this in json:
       {
-        text: "I recommend you to try the ... in the ... restaurant. It is delicious!"
+        text: "I recommend you to try the ... in the ... restaurant. ..."
       },
 
       do not forget to offer different food types to the user at everytime. Good luck!
@@ -63,6 +63,7 @@ async function summarizeWithBackend(text) {
     
     const message = JSON.parse(json).text;
     oldMessages.push({ role: "assistant", content: message });
+    oldMessages.push({ role: "user", content: "Can you offer me something different?" });
     return message;
   } catch (error) {
     console.error("Error summarizing with backend:", error);
